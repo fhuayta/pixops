@@ -18,6 +18,7 @@ def build_parser() -> argparse.ArgumentParser:
             "  pixops photo.jpg --max 1200\n"
             "  pixops photo.jpg --gray -o photo-gray.png\n"
             "  pixops shots/ -o out/ --max 1000 --canvas 1000x1000 --bg '#FFFFFF'\n"
+            "  pixops photo.jpg --crop 1:1 --max 1200\n"
             "  pixops photo.jpg --format webp --max-bytes 150kb"
         ),
         formatter_class=argparse.RawDescriptionHelpFormatter,
@@ -38,6 +39,11 @@ def build_parser() -> argparse.ArgumentParser:
         choices=("contain", "cover", "stretch"),
         default="contain",
         help="how to fill width x height (default: contain)",
+    )
+    parser.add_argument(
+        "--crop",
+        metavar="SPEC",
+        help="center crop by ratio (1:1) or box (10,20,400,300)",
     )
     parser.add_argument(
         "--canvas",
@@ -101,6 +107,7 @@ def main(argv: list[str] | None = None) -> int:
             width=args.width,
             height=args.height,
             fit=args.fit,
+            crop=args.crop,
             canvas_size=canvas_size,
             background=args.bg,
             gray=args.gray,

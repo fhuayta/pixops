@@ -1,6 +1,8 @@
+import pytest
 from PIL import Image
 
-from pixops.ops import canvas, encode_under_bytes, grayscale, resize
+from pixops.exceptions import TransformError
+from pixops.ops import canvas, crop, encode_under_bytes, grayscale, resize
 
 
 def test_resize_max_side() -> None:
@@ -34,3 +36,29 @@ def test_encode_under_bytes() -> None:
     payload = encode_under_bytes(image, "JPEG", 8_000)
     assert len(payload) <= 8_000
     assert payload[:2] == b"\xff\xd8"
+
+
+def test_crop_square_from_landscape() -> None:
+    image = Image.new("RGB", (200, 100), "red")
+    out = crop(image, "1:1")
+    assert out.size == (100, 100)
+
+
+def test_crop_ratio_tuple() -> None:
+    image = Image.new("RGB", (200, 100), "red")
+    out = crop(image, (4, 5))
+    assert out.size == (80, 100)
+
+
+def test_crop_box() -> None:
+    image = Image.new("RGB", (200, 100), "red")
+    image.putpixel((15, 25), (0, 255, 0))
+    out = crop(image, "10,20,40,30")
+    assert out.size == (40, 30)
+    assert out.getpixel((5, 5)) == (0, 255, 0)
+
+
+def test_crop_box_outside_raises() -> None:
+    image = Image.new("RGB", (20, 20), "red")
+    with pytest.raises(TransformError, match="outside"):
+        crop(image, "10,10,20,20")

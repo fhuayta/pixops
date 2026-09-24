@@ -16,6 +16,7 @@ from pixops.io import (
 )
 from pixops.ops import (
     canvas,
+    crop as crop_image,
     encode_image,
     encode_under_bytes,
     flip,
@@ -50,6 +51,7 @@ def process(
     width: int | None = None,
     height: int | None = None,
     fit: str = "contain",
+    crop: str | tuple[int, int] | tuple[int, int, int, int] | None = None,
     canvas_size: tuple[int, int] | None = None,
     background: str = "#FFFFFF",
     gray: bool = False,
@@ -62,6 +64,8 @@ def process(
     fmt: str | None = None,
 ) -> ProcessResult:
     image = load_image(source)
+    if crop is not None:
+        image = crop_image(image, crop)
     image = resize(image, max_side=max_side, width=width, height=height, fit=fit)
     if canvas_size:
         image = canvas(image, canvas_size[0], canvas_size[1], color=background)

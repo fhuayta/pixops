@@ -14,6 +14,26 @@ from pixops import process
 process("photo.jpg", "photo.webp", max_side=1200)
 ```
 
+## Crop
+
+Square from the center, then optionally shrink:
+
+```bash
+pixops photo.jpg --crop 1:1 --max 1200
+```
+
+```python
+from pixops import process
+
+process("photo.jpg", "square.webp", crop="1:1", max_side=1200)
+```
+
+A pixel box is `left,top,width,height`:
+
+```bash
+pixops photo.jpg --crop 10,20,400,300 -o cut.png
+```
+
 ## Grayscale
 
 ```bash

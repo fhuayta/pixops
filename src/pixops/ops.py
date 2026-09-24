@@ -34,6 +34,82 @@ def parse_size(value: str) -> tuple[int, int]:
     return width, height
 
 
+def parse_crop(
+    value: str | tuple[int, int] | tuple[int, int, int, int],
+) -> tuple[str, tuple[int, ...]]:
+    if isinstance(value, tuple):
+        if len(value) == 2:
+            rw, rh = value
+            if rw <= 0 or rh <= 0:
+                raise TransformError("crop ratio must be positive")
+            return "aspect", (int(rw), int(rh))
+        if len(value) == 4:
+            left, top, width, height = value
+            if width <= 0 or height <= 0:
+                raise TransformError("crop box must be positive")
+            return "box", (int(left), int(top), int(width), int(height))
+        raise TransformError("crop tuple must be (w, h) or (left, top, width, height)")
+
+    raw = value.strip().lower().replace(" ", "")
+    if ":" in raw:
+        parts = raw.split(":")
+        if len(parts) != 2:
+            raise TransformError(f"crop ratio must look like 1:1, got {value!r}")
+        try:
+            rw, rh = int(parts[0]), int(parts[1])
+        except ValueError as exc:
+            raise TransformError(f"crop ratio must look like 1:1, got {value!r}") from exc
+        if rw <= 0 or rh <= 0:
+            raise TransformError("crop ratio must be positive")
+        return "aspect", (rw, rh)
+
+    if "," in raw:
+        parts = raw.split(",")
+        if len(parts) != 4:
+            raise TransformError(f"crop box must look like 10,20,400,300, got {value!r}")
+        try:
+            left, top, width, height = (int(part) for part in parts)
+        except ValueError as exc:
+            raise TransformError(f"crop box must look like 10,20,400,300, got {value!r}") from exc
+        if width <= 0 or height <= 0:
+            raise TransformError("crop box must be positive")
+        return "box", (left, top, width, height)
+
+    raise TransformError(f"crop must look like 1:1 or 10,20,400,300, got {value!r}")
+
+
+def crop(
+    image: Image.Image,
+    spec: str | tuple[int, int] | tuple[int, int, int, int],
+) -> Image.Image:
+    kind, values = parse_crop(spec)
+    if kind == "box":
+        left, top, width, height = values
+        right, bottom = left + width, top + height
+        if left < 0 or top < 0 or right > image.width or bottom > image.height:
+            raise TransformError(
+                f"crop box {left},{top},{width},{height} is outside {image.width}x{image.height}"
+            )
+        return image.crop((left, top, right, bottom))
+
+    ratio_w, ratio_h = values
+    target = ratio_w / ratio_h
+    current = image.width / image.height
+    if abs(current - target) < 1e-6:
+        return image.copy()
+    if current > target:
+        width = max(1, round(image.height * target))
+        height = image.height
+        left = (image.width - width) // 2
+        top = 0
+    else:
+        width = image.width
+        height = max(1, round(image.width / target))
+        left = 0
+        top = (image.height - height) // 2
+    return image.crop((left, top, left + width, top + height))
+
+
 def resize(
     image: Image.Image,
     *,

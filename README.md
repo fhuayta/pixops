@@ -25,6 +25,7 @@ pixops photo.jpg --max 1200
 pixops photo.jpg --gray -o photo-gray.png
 pixops photo.jpg --format webp --quality 80
 pixops photo.jpg --max-bytes 150kb --format webp
+pixops photo.jpg --crop 1:1 --max 1200
 pixops product.jpg --canvas 1000x1000 --bg "#FFFFFF" -o product.png
 pixops shots/ -o out/ --max 1000
 ```
@@ -51,6 +52,12 @@ for item in process_many("shots/", "out/", max_side=1000, gray=True):
     print(item.source, "->", item.output)
 ```
 
+Center crop to a square, then shrink:
+
+```python
+process("photo.jpg", "square.webp", crop="1:1", max_side=1200)
+```
+
 Catalog tile (subject fitted, white square):
 
 ```python
@@ -68,6 +75,7 @@ process(
 | --- | --- |
 | `--max` / `max_side` | longest side, keep aspect |
 | `--width` `--height` `--fit` | box with contain, cover, or stretch |
+| `--crop` / `crop` | center ratio `1:1` or box `10,20,400,300` |
 | `--canvas` / `canvas_size` | letterbox onto WxH |
 | `--bg` / `background` | hex fill for the canvas |
 | `--gray` / `gray` | black and white |
@@ -83,7 +91,7 @@ Copy-paste recipes: [USAGE.md](USAGE.md). Runnable scripts live in `examples/`.
 
 ## How it works
 
-`pixops` is a thin API over Pillow. It loads the photo, applies the transforms you asked for (resize, canvas, grayscale, rotate, flip), then encodes PNG, JPEG, WebP, or AVIF. `--max-bytes` lowers quality first and scales the image only if it still does not fit. Everything runs on your machine.
+`pixops` is a thin API over Pillow. It loads the photo, applies the transforms you asked for (crop, resize, canvas, grayscale, rotate, flip), then encodes PNG, JPEG, WebP, or AVIF. Crop runs before resize, so `--crop 1:1 --max 1200` is a 1200px square. `--max-bytes` lowers quality first and scales the image only if it still does not fit. Everything runs on your machine.
 
 ## License
 
