@@ -4,13 +4,13 @@ build-backend = "hatchling.build"
 
 [project]
 name = "pixops"
-version = "0.1.1"
+version = "0.1.2"
 description = "Local image utilities: resize, convert, compress, grayscale, canvas."
 readme = "README.md"
 license = "MIT"
 requires-python = ">=3.11"
 authors = [
-  { name = "Franz Huayta Quevedo" },
+  { name = "Franz Huayta Quevedo", email = "franz.huayta.q@gmail.com" },
 ]
 keywords = [
   "image-processing",

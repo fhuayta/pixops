@@ -23,6 +23,7 @@ from pixops.ops import (
     grayscale,
     resize,
     rotate,
+    sharpen as sharpen_image,
 )
 
 ProgressCallback = Callable[[int, int, Path], None]
@@ -58,6 +59,7 @@ def process(
     degrees: float = 0,
     flip_x: bool = False,
     flip_y: bool = False,
+    sharpen: bool = False,
     quality: int = 85,
     max_bytes: int | str | None = None,
     suffix: str = "_pix",
@@ -75,6 +77,8 @@ def process(
         image = rotate(image, degrees)
     if flip_x or flip_y:
         image = flip(image, horizontal=flip_x, vertical=flip_y)
+    if sharpen:
+        image = sharpen_image(image)
 
     src_path = source if isinstance(source, Path) else None
     if isinstance(source, str):

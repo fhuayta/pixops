@@ -9,13 +9,13 @@ Sister library of [cleanbg](https://github.com/fhuayta/cleanbg) (background remo
 Python 3.11+.
 
 ```bash
-pip install -e .
+pip install pixops
 ```
 
-Later, from PyPI:
+From this repo:
 
 ```bash
-pip install pixops
+pip install -e .
 ```
 
 ## CLI
@@ -25,7 +25,7 @@ pixops photo.jpg --max 1200
 pixops photo.jpg --gray -o photo-gray.png
 pixops photo.jpg --format webp --quality 80
 pixops photo.jpg --max-bytes 150kb --format webp
-pixops photo.jpg --crop 1:1 --max 1200
+pixops photo.jpg --crop 1:1 --max 1200 --sharpen
 pixops product.jpg --canvas 1000x1000 --bg "#FFFFFF" -o product.png
 pixops shots/ -o out/ --max 1000
 ```
@@ -55,7 +55,7 @@ for item in process_many("shots/", "out/", max_side=1000, gray=True):
 Center crop to a square, then shrink:
 
 ```python
-process("photo.jpg", "square.webp", crop="1:1", max_side=1200)
+process("photo.jpg", "square.webp", crop="1:1", max_side=1200, sharpen=True)
 ```
 
 Catalog tile (subject fitted, white square):
@@ -82,6 +82,7 @@ process(
 | `--format` / `fmt` | png, jpg, webp, avif |
 | `--quality` | JPEG/WebP quality |
 | `--max-bytes` | drop quality, then scale, until it fits |
+| `--sharpen` / `sharpen` | unsharp after transforms (helps after resize) |
 | `--rotate` `--flip-x` `--flip-y` | geometry |
 | `-r` / `--suffix` | recurse folders; default filename suffix `_pix` |
 
@@ -91,7 +92,7 @@ Copy-paste recipes: [USAGE.md](USAGE.md). Runnable scripts live in `examples/`.
 
 ## How it works
 
-`pixops` is a thin API over Pillow. It loads the photo, applies the transforms you asked for (crop, resize, canvas, grayscale, rotate, flip), then encodes PNG, JPEG, WebP, or AVIF. Crop runs before resize, so `--crop 1:1 --max 1200` is a 1200px square. `--max-bytes` lowers quality first and scales the image only if it still does not fit. Everything runs on your machine.
+`pixops` is a thin API over Pillow. It loads the photo, applies the transforms you asked for (crop, resize, canvas, grayscale, rotate, flip, sharpen), then encodes PNG, JPEG, WebP, or AVIF. Crop runs before resize, so `--crop 1:1 --max 1200` is a 1200px square. `--sharpen` is an unsharp mask after those steps. `--max-bytes` lowers quality first and scales the image only if it still does not fit. Everything runs on your machine.
 
 ## License
 

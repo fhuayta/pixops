@@ -2,7 +2,7 @@ import pytest
 from PIL import Image
 
 from pixops.exceptions import TransformError
-from pixops.ops import canvas, crop, encode_under_bytes, grayscale, resize
+from pixops.ops import canvas, crop, encode_under_bytes, grayscale, resize, sharpen
 
 
 def test_resize_max_side() -> None:
@@ -62,3 +62,21 @@ def test_crop_box_outside_raises() -> None:
     image = Image.new("RGB", (20, 20), "red")
     with pytest.raises(TransformError, match="outside"):
         crop(image, "10,10,20,20")
+
+
+def test_sharpen_keeps_size_and_alpha() -> None:
+    image = Image.new("RGBA", (40, 40), (200, 200, 200, 180))
+    for x in range(20):
+        for y in range(40):
+            image.putpixel((x, y), (80, 80, 80, 180))
+    out = sharpen(image)
+    assert out.size == (40, 40)
+    assert out.mode == "RGBA"
+    assert out.getpixel((0, 0))[3] == 180
+    assert out.tobytes() != image.tobytes()
+
+
+def test_sharpen_rejects_bad_percent() -> None:
+    image = Image.new("RGB", (8, 8), "red")
+    with pytest.raises(TransformError, match="percent"):
+        sharpen(image, percent=0)

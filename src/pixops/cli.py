@@ -18,7 +18,7 @@ def build_parser() -> argparse.ArgumentParser:
             "  pixops photo.jpg --max 1200\n"
             "  pixops photo.jpg --gray -o photo-gray.png\n"
             "  pixops shots/ -o out/ --max 1000 --canvas 1000x1000 --bg '#FFFFFF'\n"
-            "  pixops photo.jpg --crop 1:1 --max 1200\n"
+            "  pixops photo.jpg --crop 1:1 --max 1200 --sharpen\n"
             "  pixops photo.jpg --format webp --max-bytes 150kb"
         ),
         formatter_class=argparse.RawDescriptionHelpFormatter,
@@ -56,6 +56,11 @@ def build_parser() -> argparse.ArgumentParser:
         help="hex fill for the canvas (default: #FFFFFF)",
     )
     parser.add_argument("--gray", action="store_true", help="convert to grayscale")
+    parser.add_argument(
+        "--sharpen",
+        action="store_true",
+        help="unsharp mask after transforms (helps after resize)",
+    )
     parser.add_argument("--rotate", type=float, default=0, metavar="DEG")
     parser.add_argument("--flip-x", action="store_true")
     parser.add_argument("--flip-y", action="store_true")
@@ -114,6 +119,7 @@ def main(argv: list[str] | None = None) -> int:
             degrees=args.rotate,
             flip_x=args.flip_x,
             flip_y=args.flip_y,
+            sharpen=args.sharpen,
             quality=args.quality,
             max_bytes=args.max_bytes,
             progress=progress if source.is_dir() else None,

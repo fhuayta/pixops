@@ -51,3 +51,15 @@ def test_cli_crop(tmp_path: Path) -> None:
     dest = tmp_path / "square.png"
     assert main([str(src), "--crop", "1:1", "-o", str(dest)]) == 0
     assert Image.open(dest).size == (150, 150)
+
+
+def test_cli_sharpen(tmp_path: Path) -> None:
+    src = tmp_path / "photo.png"
+    image = Image.new("RGB", (200, 100), "white")
+    for x in range(100):
+        for y in range(100):
+            image.putpixel((x, y), (0, 0, 0))
+    image.save(src)
+    dest = tmp_path / "crisp.png"
+    assert main([str(src), "--max", "100", "--sharpen", "-o", str(dest)]) == 0
+    assert Image.open(dest).size == (100, 50)

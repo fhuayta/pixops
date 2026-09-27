@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from io import BytesIO
 
-from PIL import Image, ImageOps
+from PIL import Image, ImageFilter, ImageOps
 
 from pixops.exceptions import TransformError
 
@@ -183,6 +183,32 @@ def canvas(
     else:
         board.paste(fitted, (x, y))
     return board
+
+
+def sharpen(
+    image: Image.Image,
+    *,
+    percent: int = 150,
+    radius: float = 1.5,
+    threshold: int = 3,
+) -> Image.Image:
+    if percent <= 0:
+        raise TransformError("sharpen percent must be positive")
+    if radius <= 0:
+        raise TransformError("sharpen radius must be positive")
+    if threshold < 0:
+        raise TransformError("sharpen threshold cannot be negative")
+
+    mask = ImageFilter.UnsharpMask(radius=radius, percent=percent, threshold=threshold)
+    if image.mode in {"RGBA", "LA"}:
+        alpha = image.getchannel("A")
+        rgb = image.convert("RGB").filter(mask)
+        out = rgb.convert("RGBA")
+        out.putalpha(alpha)
+        return out
+    if image.mode == "P":
+        return image.convert("RGB").filter(mask)
+    return image.filter(mask)
 
 
 def rotate(image: Image.Image, degrees: float) -> Image.Image:

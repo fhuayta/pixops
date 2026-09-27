@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.2
+
+- Unsharp mask after transforms (`--sharpen` / `sharpen=True`). Useful after resize.
+
 ## 0.1.1
 
 - Center crop by ratio (`--crop 1:1`) or box (`--crop 10,20,400,300`). Crop runs before resize.

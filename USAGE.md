@@ -34,6 +34,20 @@ A pixel box is `left,top,width,height`:
 pixops photo.jpg --crop 10,20,400,300 -o cut.png
 ```
 
+## Sharpen
+
+Unsharp after resize so downscaled photos stay crisp:
+
+```bash
+pixops photo.jpg --max 1200 --sharpen
+```
+
+```python
+from pixops import process
+
+process("photo.jpg", "photo.webp", max_side=1200, sharpen=True)
+```
+
 ## Grayscale
 
 ```bash
