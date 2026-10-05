@@ -53,6 +53,17 @@ def test_cli_crop(tmp_path: Path) -> None:
     assert Image.open(dest).size == (150, 150)
 
 
+def test_cli_transparent_canvas(tmp_path: Path) -> None:
+    src = tmp_path / "cutout.png"
+    Image.new("RGBA", (20, 10), (255, 0, 0, 255)).save(src)
+    dest = tmp_path / "tile.png"
+    assert main([str(src), "--canvas", "40x40", "--bg", "transparent", "-o", str(dest)]) == 0
+    out = Image.open(dest)
+    assert out.mode == "RGBA"
+    assert out.size == (40, 40)
+    assert out.getpixel((0, 0))[3] == 0
+
+
 def test_cli_sharpen(tmp_path: Path) -> None:
     src = tmp_path / "photo.png"
     image = Image.new("RGB", (200, 100), "white")

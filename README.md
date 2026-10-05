@@ -27,6 +27,7 @@ pixops photo.jpg --format webp --quality 80
 pixops photo.jpg --max-bytes 150kb --format webp
 pixops photo.jpg --crop 1:1 --max 1200 --sharpen
 pixops product.jpg --canvas 1000x1000 --bg "#FFFFFF" -o product.png
+pixops cutout.png --canvas 1000x1000 --bg transparent -o tile.png
 pixops shots/ -o out/ --max 1000
 ```
 
@@ -58,7 +59,7 @@ Center crop to a square, then shrink:
 process("photo.jpg", "square.webp", crop="1:1", max_side=1200, sharpen=True)
 ```
 
-Catalog tile (subject fitted, white square):
+Catalog tile (subject fitted, white square, or a transparent one for a cutout):
 
 ```python
 process(
@@ -66,6 +67,13 @@ process(
     "tile.png",
     canvas_size=(1000, 1000),
     background="#FFFFFF",
+)
+
+process(
+    "cutout.png",
+    "tile.png",
+    canvas_size=(1000, 1000),
+    background="transparent",
 )
 ```
 
@@ -77,7 +85,7 @@ process(
 | `--width` `--height` `--fit` | box with contain, cover, or stretch |
 | `--crop` / `crop` | center ratio `1:1` or box `10,20,400,300` |
 | `--canvas` / `canvas_size` | letterbox onto WxH |
-| `--bg` / `background` | hex fill for the canvas |
+| `--bg` / `background` | canvas fill: `#RRGGBB`, `#RRGGBBAA`, or `transparent` |
 | `--gray` / `gray` | black and white |
 | `--format` / `fmt` | png, jpg, webp, avif |
 | `--quality` | JPEG/WebP quality |

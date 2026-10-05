@@ -28,7 +28,30 @@ def test_canvas_centers() -> None:
     image = Image.new("RGB", (20, 10), "red")
     out = canvas(image, 40, 40, color="#00FF00")
     assert out.size == (40, 40)
+    assert out.mode == "RGB"
     assert out.getpixel((0, 0)) == (0, 255, 0)
+
+
+def test_canvas_transparent_margins() -> None:
+    image = Image.new("RGBA", (20, 10), (255, 0, 0, 255))
+    out = canvas(image, 40, 40, color="transparent")
+    assert out.mode == "RGBA"
+    assert out.getpixel((0, 0)) == (0, 0, 0, 0)
+    assert out.getpixel((20, 20)) == (255, 0, 0, 255)
+
+
+def test_canvas_hex_alpha() -> None:
+    image = Image.new("RGB", (20, 10), "red")
+    out = canvas(image, 40, 40, color="#00FF0080")
+    assert out.mode == "RGBA"
+    assert out.getpixel((0, 0)) == (0, 255, 0, 128)
+    assert out.getpixel((20, 20)) == (255, 0, 0, 255)
+
+
+def test_canvas_rejects_bad_color() -> None:
+    image = Image.new("RGB", (8, 8), "red")
+    with pytest.raises(TransformError, match="invalid color"):
+        canvas(image, 16, 16, color="red")
 
 
 def test_encode_under_bytes() -> None:

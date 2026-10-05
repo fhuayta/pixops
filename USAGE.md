@@ -74,6 +74,16 @@ from pixops import process_many
 process_many("shots/", "tiles/", canvas_size=(1000, 1000), background="#FFFFFF")
 ```
 
+A cutout keeps transparent margins on PNG or WebP. JPEG flattens them to white:
+
+```bash
+pixops cutout.png --canvas 1000x1000 --bg transparent -o tile.png
+```
+
+```python
+process("cutout.png", "tile.png", canvas_size=(1000, 1000), background="transparent")
+```
+
 ## Smallest useful file
 
 ```bash

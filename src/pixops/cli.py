@@ -18,6 +18,7 @@ def build_parser() -> argparse.ArgumentParser:
             "  pixops photo.jpg --max 1200\n"
             "  pixops photo.jpg --gray -o photo-gray.png\n"
             "  pixops shots/ -o out/ --max 1000 --canvas 1000x1000 --bg '#FFFFFF'\n"
+            "  pixops cutout.png --canvas 1000x1000 --bg transparent -o tile.png\n"
             "  pixops photo.jpg --crop 1:1 --max 1200 --sharpen\n"
             "  pixops photo.jpg --format webp --max-bytes 150kb"
         ),
@@ -53,7 +54,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--bg",
         default="#FFFFFF",
-        help="hex fill for the canvas (default: #FFFFFF)",
+        help="canvas fill: #RRGGBB, #RRGGBBAA, or transparent (default: #FFFFFF)",
     )
     parser.add_argument("--gray", action="store_true", help="convert to grayscale")
     parser.add_argument(

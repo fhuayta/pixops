@@ -9,16 +9,30 @@ from pixops.exceptions import TransformError
 Fit = str
 
 
-def parse_hex_color(value: str) -> tuple[int, int, int]:
-    raw = value.strip().lstrip("#")
-    if len(raw) == 3:
+def parse_color(value: str) -> tuple[int, int, int, int]:
+    raw = value.strip().lower()
+    if raw == "transparent":
+        return 0, 0, 0, 0
+    raw = raw.lstrip("#")
+    if len(raw) in {3, 4}:
         raw = "".join(ch * 2 for ch in raw)
-    if len(raw) != 6:
-        raise TransformError(f"invalid hex color: {value!r}")
+    if len(raw) == 6:
+        raw += "ff"
+    if len(raw) != 8:
+        raise TransformError(
+            f"invalid color: {value!r}; use #RRGGBB, #RRGGBBAA, or transparent"
+        )
     try:
-        return int(raw[0:2], 16), int(raw[2:4], 16), int(raw[4:6], 16)
+        return (
+            int(raw[0:2], 16),
+            int(raw[2:4], 16),
+            int(raw[4:6], 16),
+            int(raw[6:8], 16),
+        )
     except ValueError as exc:
-        raise TransformError(f"invalid hex color: {value!r}") from exc
+        raise TransformError(
+            f"invalid color: {value!r}; use #RRGGBB, #RRGGBBAA, or transparent"
+        ) from exc
 
 
 def parse_size(value: str) -> tuple[int, int]:
@@ -170,15 +184,15 @@ def canvas(
 ) -> Image.Image:
     if width <= 0 or height <= 0:
         raise TransformError("canvas size must be positive")
-    rgb = parse_hex_color(color)
-    has_alpha = image.mode in {"RGBA", "LA"}
-    mode = "RGBA" if has_alpha else "RGB"
-    fill: tuple[int, ...] = (*rgb, 255) if mode == "RGBA" else rgb
+    red, green, blue, alpha = parse_color(color)
+    needs_alpha = alpha < 255 or image.mode in {"RGBA", "LA"}
+    mode = "RGBA" if needs_alpha else "RGB"
+    fill: tuple[int, ...] = (red, green, blue, alpha) if mode == "RGBA" else (red, green, blue)
     board = Image.new(mode, (width, height), fill)
     fitted = ImageOps.contain(image.convert(mode), (width, height), method=Image.Resampling.LANCZOS)
     x = (width - fitted.width) // 2
     y = (height - fitted.height) // 2
-    if has_alpha:
+    if mode == "RGBA":
         board.paste(fitted, (x, y), fitted)
     else:
         board.paste(fitted, (x, y))

@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.3
+
+- Canvas fill can be `transparent` or an 8-digit hex (`#RRGGBBAA`). Opaque `#RRGGBB` is unchanged. Use PNG or WebP if the margins should stay transparent.
+
 ## 0.1.2
 
 - Unsharp mask after transforms (`--sharpen` / `sharpen=True`). Useful after resize.
