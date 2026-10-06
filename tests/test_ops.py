@@ -2,7 +2,7 @@ import pytest
 from PIL import Image
 
 from pixops.exceptions import TransformError
-from pixops.ops import canvas, crop, encode_under_bytes, grayscale, resize, sharpen
+from pixops.ops import canvas, crop, encode_under_bytes, grayscale, pad, resize, sharpen
 
 
 def test_resize_max_side() -> None:
@@ -46,6 +46,30 @@ def test_canvas_hex_alpha() -> None:
     assert out.mode == "RGBA"
     assert out.getpixel((0, 0)) == (0, 255, 0, 128)
     assert out.getpixel((20, 20)) == (255, 0, 0, 255)
+
+
+def test_pad_uniform() -> None:
+    image = Image.new("RGB", (20, 10), "red")
+    out = pad(image, 40, color="#FFFFFF")
+    assert out.size == (100, 90)
+    assert out.mode == "RGB"
+    assert out.getpixel((0, 0)) == (255, 255, 255)
+    assert out.getpixel((40, 40)) == (255, 0, 0)
+
+
+def test_pad_axes_and_transparent() -> None:
+    image = Image.new("RGBA", (20, 10), (255, 0, 0, 255))
+    out = pad(image, "10,20", color="transparent")
+    assert out.size == (60, 30)
+    assert out.mode == "RGBA"
+    assert out.getpixel((0, 0)) == (0, 0, 0, 0)
+    assert out.getpixel((20, 10)) == (255, 0, 0, 255)
+
+
+def test_pad_rejects_negative() -> None:
+    image = Image.new("RGB", (8, 8), "red")
+    with pytest.raises(TransformError, match="negative"):
+        pad(image, "-4")
 
 
 def test_canvas_rejects_bad_color() -> None:

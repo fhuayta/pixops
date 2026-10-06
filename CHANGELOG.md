@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.4
+
+- Margin around the image (`--pad 40`, `10,20`, or `10,20,10,20`). Uses the same fill as the canvas, including `transparent`.
+
 ## 0.1.3
 
 - Canvas fill can be `transparent` or an 8-digit hex (`#RRGGBBAA`). Opaque `#RRGGBB` is unchanged. Use PNG or WebP if the margins should stay transparent.

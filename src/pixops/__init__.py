@@ -2,7 +2,7 @@
 
 from pixops.exceptions import PixOpsError, OutputError, TransformError, UnsupportedInputError
 from pixops.io import load_image, save_bytes
-from pixops.ops import canvas, crop, encode_under_bytes, grayscale, resize, sharpen
+from pixops.ops import canvas, crop, encode_under_bytes, grayscale, pad, resize, sharpen
 from pixops.pipeline import ProcessResult, process, process_many
 
 __all__ = [
@@ -16,6 +16,7 @@ __all__ = [
     "encode_under_bytes",
     "grayscale",
     "load_image",
+    "pad",
     "process",
     "process_many",
     "resize",
@@ -24,4 +25,4 @@ __all__ = [
     "__version__",
 ]
 
-__version__ = "0.1.3"
+__version__ = "0.1.4"

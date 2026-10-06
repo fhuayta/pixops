@@ -28,6 +28,7 @@ pixops photo.jpg --max-bytes 150kb --format webp
 pixops photo.jpg --crop 1:1 --max 1200 --sharpen
 pixops product.jpg --canvas 1000x1000 --bg "#FFFFFF" -o product.png
 pixops cutout.png --canvas 1000x1000 --bg transparent -o tile.png
+pixops cutout.png --pad 40 --bg transparent -o padded.png
 pixops shots/ -o out/ --max 1000
 ```
 
@@ -77,6 +78,12 @@ process(
 )
 ```
 
+Extra margin without locking the size:
+
+```python
+process("cutout.png", "padded.png", pad=40, background="transparent")
+```
+
 ## What it does
 
 | Flag / argument | Effect |
@@ -85,7 +92,8 @@ process(
 | `--width` `--height` `--fit` | box with contain, cover, or stretch |
 | `--crop` / `crop` | center ratio `1:1` or box `10,20,400,300` |
 | `--canvas` / `canvas_size` | letterbox onto WxH |
-| `--bg` / `background` | canvas fill: `#RRGGBB`, `#RRGGBBAA`, or `transparent` |
+| `--bg` / `background` | fill for canvas and pad: `#RRGGBB`, `#RRGGBBAA`, or `transparent` |
+| `--pad` / `pad` | margin: `40`, `10,20`, or `10,20,10,20` |
 | `--gray` / `gray` | black and white |
 | `--format` / `fmt` | png, jpg, webp, avif |
 | `--quality` | JPEG/WebP quality |
@@ -100,7 +108,7 @@ Copy-paste recipes: [USAGE.md](USAGE.md). Runnable scripts live in `examples/`.
 
 ## How it works
 
-`pixops` is a thin API over Pillow. It loads the photo, applies the transforms you asked for (crop, resize, canvas, grayscale, rotate, flip, sharpen), then encodes PNG, JPEG, WebP, or AVIF. Crop runs before resize, so `--crop 1:1 --max 1200` is a 1200px square. `--sharpen` is an unsharp mask after those steps. `--max-bytes` lowers quality first and scales the image only if it still does not fit. Everything runs on your machine.
+`pixops` is a thin API over Pillow. It loads the photo, applies the transforms you asked for (crop, resize, canvas, pad, grayscale, rotate, flip, sharpen), then encodes PNG, JPEG, WebP, or AVIF. Crop runs before resize, so `--crop 1:1 --max 1200` is a 1200px square. `--sharpen` is an unsharp mask after those steps. `--max-bytes` lowers quality first and scales the image only if it still does not fit. Everything runs on your machine.
 
 ## License
 

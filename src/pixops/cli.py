@@ -19,6 +19,7 @@ def build_parser() -> argparse.ArgumentParser:
             "  pixops photo.jpg --gray -o photo-gray.png\n"
             "  pixops shots/ -o out/ --max 1000 --canvas 1000x1000 --bg '#FFFFFF'\n"
             "  pixops cutout.png --canvas 1000x1000 --bg transparent -o tile.png\n"
+            "  pixops cutout.png --pad 40 --bg transparent -o padded.png\n"
             "  pixops photo.jpg --crop 1:1 --max 1200 --sharpen\n"
             "  pixops photo.jpg --format webp --max-bytes 150kb"
         ),
@@ -54,7 +55,12 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--bg",
         default="#FFFFFF",
-        help="canvas fill: #RRGGBB, #RRGGBBAA, or transparent (default: #FFFFFF)",
+        help="fill for --canvas and --pad: #RRGGBB, #RRGGBBAA, or transparent (default: #FFFFFF)",
+    )
+    parser.add_argument(
+        "--pad",
+        metavar="PX",
+        help="margin around the image: 40, 10,20, or 10,20,10,20",
     )
     parser.add_argument("--gray", action="store_true", help="convert to grayscale")
     parser.add_argument(
@@ -116,6 +122,7 @@ def main(argv: list[str] | None = None) -> int:
             crop=args.crop,
             canvas_size=canvas_size,
             background=args.bg,
+            pad=args.pad,
             gray=args.gray,
             degrees=args.rotate,
             flip_x=args.flip_x,

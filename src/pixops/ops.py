@@ -199,6 +199,60 @@ def canvas(
     return board
 
 
+def parse_pad(value: int | str | tuple[int, ...]) -> tuple[int, int, int, int]:
+    if isinstance(value, int):
+        parts: tuple[int, ...] = (value,)
+    elif isinstance(value, tuple):
+        parts = tuple(int(part) for part in value)
+    else:
+        raw = value.strip().lower().replace(" ", "")
+        try:
+            parts = tuple(int(part) for part in raw.split(","))
+        except ValueError as exc:
+            raise TransformError(
+                f"pad must look like 40, 10,20, or 10,20,10,20, got {value!r}"
+            ) from exc
+
+    if len(parts) == 1:
+        top = right = bottom = left = parts[0]
+    elif len(parts) == 2:
+        top = bottom = parts[0]
+        right = left = parts[1]
+    elif len(parts) == 4:
+        top, right, bottom, left = parts
+    else:
+        raise TransformError(
+            f"pad must look like 40, 10,20, or 10,20,10,20, got {value!r}"
+        )
+    if min(top, right, bottom, left) < 0:
+        raise TransformError("pad cannot be negative")
+    return top, right, bottom, left
+
+
+def pad(
+    image: Image.Image,
+    amount: int | str | tuple[int, ...],
+    *,
+    color: str = "#FFFFFF",
+) -> Image.Image:
+    top, right, bottom, left = parse_pad(amount)
+    if top == right == bottom == left == 0:
+        return image.copy()
+    red, green, blue, alpha = parse_color(color)
+    needs_alpha = alpha < 255 or image.mode in {"RGBA", "LA"}
+    mode = "RGBA" if needs_alpha else "RGB"
+    fill: tuple[int, ...] = (red, green, blue, alpha) if mode == "RGBA" else (red, green, blue)
+    width = image.width + left + right
+    height = image.height + top + bottom
+    board = Image.new(mode, (width, height), fill)
+    pasted = image.convert(mode)
+    if mode == "RGBA":
+        board.paste(pasted, (left, top), pasted)
+    else:
+        board.paste(pasted, (left, top))
+    return board
+
+
 def sharpen(
     image: Image.Image,
     *,

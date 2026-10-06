@@ -84,6 +84,18 @@ pixops cutout.png --canvas 1000x1000 --bg transparent -o tile.png
 process("cutout.png", "tile.png", canvas_size=(1000, 1000), background="transparent")
 ```
 
+## Padding
+
+Add a margin and keep the photo the same size. `40` is every side. `10,20` is vertical, then horizontal. `10,20,10,20` is top, right, bottom, left.
+
+```bash
+pixops cutout.png --pad 40 --bg transparent -o padded.png
+```
+
+```python
+process("cutout.png", "padded.png", pad=40, background="transparent")
+```
+
 ## Smallest useful file
 
 ```bash

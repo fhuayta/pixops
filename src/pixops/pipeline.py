@@ -21,6 +21,7 @@ from pixops.ops import (
     encode_under_bytes,
     flip,
     grayscale,
+    pad as pad_image,
     resize,
     rotate,
     sharpen as sharpen_image,
@@ -55,6 +56,7 @@ def process(
     crop: str | tuple[int, int] | tuple[int, int, int, int] | None = None,
     canvas_size: tuple[int, int] | None = None,
     background: str = "#FFFFFF",
+    pad: int | str | tuple[int, ...] | None = None,
     gray: bool = False,
     degrees: float = 0,
     flip_x: bool = False,
@@ -79,6 +81,8 @@ def process(
         image = flip(image, horizontal=flip_x, vertical=flip_y)
     if sharpen:
         image = sharpen_image(image)
+    if pad is not None:
+        image = pad_image(image, pad, color=background)
 
     src_path = source if isinstance(source, Path) else None
     if isinstance(source, str):
