@@ -62,6 +62,7 @@ def process(
     flip_x: bool = False,
     flip_y: bool = False,
     sharpen: bool = False,
+    strip: bool = False,
     quality: int = 85,
     max_bytes: int | str | None = None,
     suffix: str = "_pix",
@@ -102,9 +103,9 @@ def process(
         codec = fmt or _output_format(dest)
         limit = parse_bytes(max_bytes) if max_bytes is not None else None
         payload = (
-            encode_under_bytes(image, codec, limit)
+            encode_under_bytes(image, codec, limit, strip=strip)
             if limit
-            else encode_image(image, codec, quality=quality)
+            else encode_image(image, codec, quality=quality, strip=strip)
         )
         dest.parent.mkdir(parents=True, exist_ok=True)
         dest.write_bytes(payload)

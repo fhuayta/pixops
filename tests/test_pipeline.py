@@ -53,6 +53,28 @@ def test_cli_crop(tmp_path: Path) -> None:
     assert Image.open(dest).size == (150, 150)
 
 
+def test_cli_strip(tmp_path: Path) -> None:
+    src = tmp_path / "photo.jpg"
+    image = Image.new("RGB", (40, 20), "navy")
+    exif = image.getexif()
+    exif[271] = "TestCam"
+    image.save(src, exif=exif, quality=90)
+    dest = tmp_path / "clean.jpg"
+    assert main([str(src), "--strip", "-o", str(dest)]) == 0
+    assert dict(Image.open(dest).getexif()) == {}
+
+
+def test_process_keeps_exif_by_default(tmp_path: Path) -> None:
+    src = tmp_path / "photo.jpg"
+    image = Image.new("RGB", (40, 20), "navy")
+    exif = image.getexif()
+    exif[271] = "TestCam"
+    image.save(src, exif=exif, quality=90)
+    dest = tmp_path / "kept.jpg"
+    process(src, dest)
+    assert dict(Image.open(dest).getexif()).get(271) == "TestCam"
+
+
 def test_cli_pad(tmp_path: Path) -> None:
     src = tmp_path / "cutout.png"
     Image.new("RGBA", (20, 10), (255, 0, 0, 255)).save(src)

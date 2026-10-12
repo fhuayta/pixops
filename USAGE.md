@@ -96,6 +96,18 @@ pixops cutout.png --pad 40 --bg transparent -o padded.png
 process("cutout.png", "padded.png", pad=40, background="transparent")
 ```
 
+## Strip metadata
+
+Orientation is fixed on load. Use `--strip` if the output should not keep the remaining EXIF or ICC profile:
+
+```bash
+pixops photo.jpg --max 1200 --strip -o clean.jpg
+```
+
+```python
+process("photo.jpg", "clean.jpg", max_side=1200, strip=True)
+```
+
 ## Smallest useful file
 
 ```bash

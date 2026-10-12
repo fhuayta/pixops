@@ -292,18 +292,39 @@ def flip(image: Image.Image, *, horizontal: bool = False, vertical: bool = False
     return out
 
 
+def strip_metadata(image: Image.Image) -> Image.Image:
+    """Drop EXIF, ICC, and other sidecar tags from a copy of the image."""
+    out = image.copy()
+    out.info = {}
+    return out
+
+
+def _metadata_save_kwargs(image: Image.Image, *, strip: bool) -> dict[str, object]:
+    if strip:
+        return {}
+    kwargs: dict[str, object] = {}
+    exif = image.info.get("exif")
+    if exif:
+        kwargs["exif"] = exif
+    icc = image.info.get("icc_profile")
+    if icc:
+        kwargs["icc_profile"] = icc
+    return kwargs
+
+
 def encode_image(
     image: Image.Image,
     fmt: str,
     *,
     quality: int = 85,
+    strip: bool = False,
 ) -> bytes:
     fmt = fmt.upper()
     if fmt == "JPG":
         fmt = "JPEG"
     buf = BytesIO()
-    to_save = image
-    save_kwargs: dict[str, object] = {}
+    meta = _metadata_save_kwargs(image, strip=strip)
+    to_save = strip_metadata(image) if strip else image
 
     if fmt == "JPEG":
         if to_save.mode in {"RGBA", "LA"}:
@@ -312,14 +333,17 @@ def encode_image(
             to_save = bg
         elif to_save.mode != "RGB":
             to_save = to_save.convert("RGB")
-        save_kwargs = {"quality": quality, "optimize": True}
+        save_kwargs: dict[str, object] = {"quality": quality, "optimize": True}
     elif fmt == "WEBP":
         save_kwargs = {"quality": quality, "method": 4}
     elif fmt == "PNG":
         save_kwargs = {"optimize": True}
     elif fmt == "AVIF":
         save_kwargs = {"quality": quality}
+    else:
+        save_kwargs = {}
 
+    save_kwargs.update(meta)
     to_save.save(buf, format=fmt, **save_kwargs)
     return buf.getvalue()
 
@@ -330,6 +354,7 @@ def encode_under_bytes(
     max_bytes: int,
     *,
     min_quality: int = 35,
+    strip: bool = False,
 ) -> bytes:
     """Drop quality, then scale, until the file fits under max_bytes."""
     if max_bytes <= 0:
@@ -338,7 +363,7 @@ def encode_under_bytes(
     working = image
     for _ in range(8):
         for quality in range(90, min_quality - 1, -5):
-            payload = encode_image(working, fmt, quality=quality)
+            payload = encode_image(working, fmt, quality=quality, strip=strip)
             if len(payload) <= max_bytes:
                 return payload
         next_w = max(1, int(working.width * 0.85))
@@ -347,7 +372,7 @@ def encode_under_bytes(
             break
         working = working.resize((next_w, next_h), Image.Resampling.LANCZOS)
 
-    payload = encode_image(working, fmt, quality=min_quality)
+    payload = encode_image(working, fmt, quality=min_quality, strip=strip)
     if len(payload) > max_bytes:
         raise TransformError(
             f"could not fit image under {max_bytes} bytes (got {len(payload)})"

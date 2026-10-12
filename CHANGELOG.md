@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.5
+
+- Drop EXIF and ICC on save (`--strip` / `strip=True`). Without it, remaining tags are kept after EXIF orientation is applied on load.
+
 ## 0.1.4
 
 - Margin around the image (`--pad 40`, `10,20`, or `10,20,10,20`). Uses the same fill as the canvas, including `transparent`.

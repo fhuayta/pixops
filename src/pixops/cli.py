@@ -21,7 +21,8 @@ def build_parser() -> argparse.ArgumentParser:
             "  pixops cutout.png --canvas 1000x1000 --bg transparent -o tile.png\n"
             "  pixops cutout.png --pad 40 --bg transparent -o padded.png\n"
             "  pixops photo.jpg --crop 1:1 --max 1200 --sharpen\n"
-            "  pixops photo.jpg --format webp --max-bytes 150kb"
+            "  pixops photo.jpg --format webp --max-bytes 150kb\n"
+            "  pixops photo.jpg --max 1200 --strip -o clean.jpg"
         ),
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
@@ -72,6 +73,11 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--flip-x", action="store_true")
     parser.add_argument("--flip-y", action="store_true")
     parser.add_argument("--quality", type=int, default=85, help="JPEG/WebP quality (default: 85)")
+    parser.add_argument(
+        "--strip",
+        action="store_true",
+        help="drop EXIF and ICC profile when saving",
+    )
     parser.add_argument(
         "--max-bytes",
         metavar="SIZE",
@@ -128,6 +134,7 @@ def main(argv: list[str] | None = None) -> int:
             flip_x=args.flip_x,
             flip_y=args.flip_y,
             sharpen=args.sharpen,
+            strip=args.strip,
             quality=args.quality,
             max_bytes=args.max_bytes,
             progress=progress if source.is_dir() else None,

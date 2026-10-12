@@ -29,6 +29,7 @@ pixops photo.jpg --crop 1:1 --max 1200 --sharpen
 pixops product.jpg --canvas 1000x1000 --bg "#FFFFFF" -o product.png
 pixops cutout.png --canvas 1000x1000 --bg transparent -o tile.png
 pixops cutout.png --pad 40 --bg transparent -o padded.png
+pixops photo.jpg --max 1200 --strip -o clean.jpg
 pixops shots/ -o out/ --max 1000
 ```
 
@@ -99,6 +100,7 @@ process("cutout.png", "padded.png", pad=40, background="transparent")
 | `--quality` | JPEG/WebP quality |
 | `--max-bytes` | drop quality, then scale, until it fits |
 | `--sharpen` / `sharpen` | unsharp after transforms (helps after resize) |
+| `--strip` / `strip` | drop EXIF and ICC when saving |
 | `--rotate` `--flip-x` `--flip-y` | geometry |
 | `-r` / `--suffix` | recurse folders; default filename suffix `_pix` |
 
@@ -108,7 +110,7 @@ Copy-paste recipes: [USAGE.md](USAGE.md). Runnable scripts live in `examples/`.
 
 ## How it works
 
-`pixops` is a thin API over Pillow. It loads the photo, applies the transforms you asked for (crop, resize, canvas, pad, grayscale, rotate, flip, sharpen), then encodes PNG, JPEG, WebP, or AVIF. Crop runs before resize, so `--crop 1:1 --max 1200` is a 1200px square. `--sharpen` is an unsharp mask after those steps. `--max-bytes` lowers quality first and scales the image only if it still does not fit. Everything runs on your machine.
+`pixops` is a thin API over Pillow. It loads the photo, applies the transforms you asked for (crop, resize, canvas, pad, grayscale, rotate, flip, sharpen), then encodes PNG, JPEG, WebP, or AVIF. Crop runs before resize, so `--crop 1:1 --max 1200` is a 1200px square. `--sharpen` is an unsharp mask after those steps. `--max-bytes` lowers quality first and scales the image only if it still does not fit. `--strip` drops EXIF and ICC on save; otherwise remaining tags are kept. Everything runs on your machine.
 
 ## License
 

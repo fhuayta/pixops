@@ -2,7 +2,17 @@ import pytest
 from PIL import Image
 
 from pixops.exceptions import TransformError
-from pixops.ops import canvas, crop, encode_under_bytes, grayscale, pad, resize, sharpen
+from pixops.ops import (
+    canvas,
+    crop,
+    encode_image,
+    encode_under_bytes,
+    grayscale,
+    pad,
+    resize,
+    sharpen,
+    strip_metadata,
+)
 
 
 def test_resize_max_side() -> None:
@@ -83,6 +93,33 @@ def test_encode_under_bytes() -> None:
     payload = encode_under_bytes(image, "JPEG", 8_000)
     assert len(payload) <= 8_000
     assert payload[:2] == b"\xff\xd8"
+
+
+def test_strip_metadata_clears_info() -> None:
+    image = Image.new("RGB", (8, 8), "red")
+    image.info["exif"] = b"Exif\x00\x00"
+    image.info["icc_profile"] = b"profile"
+    out = strip_metadata(image)
+    assert "exif" not in out.info
+    assert "icc_profile" not in out.info
+    assert "exif" in image.info
+
+
+def test_encode_keeps_and_strips_exif() -> None:
+    image = Image.new("RGB", (32, 16), "navy")
+    exif = image.getexif()
+    exif[271] = "TestCam"
+    from io import BytesIO
+
+    buf = BytesIO()
+    image.save(buf, format="JPEG", exif=exif, quality=90)
+    loaded = Image.open(BytesIO(buf.getvalue()))
+    loaded.load()
+
+    kept = encode_image(loaded, "JPEG", quality=90, strip=False)
+    stripped = encode_image(loaded, "JPEG", quality=90, strip=True)
+    assert dict(Image.open(BytesIO(kept)).getexif()).get(271) == "TestCam"
+    assert dict(Image.open(BytesIO(stripped)).getexif()) == {}
 
 
 def test_crop_square_from_landscape() -> None:
