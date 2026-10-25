@@ -26,6 +26,7 @@ pixops photo.jpg --gray -o photo-gray.png
 pixops photo.jpg --format webp --quality 80
 pixops photo.jpg --max-bytes 150kb --format webp
 pixops photo.jpg --crop 1:1 --max 1200 --sharpen
+pixops photo.jpg --max 800 --blur 2 -o soft.jpg
 pixops product.jpg --canvas 1000x1000 --bg "#FFFFFF" -o product.png
 pixops cutout.png --canvas 1000x1000 --bg transparent -o tile.png
 pixops cutout.png --pad 40 --bg transparent -o padded.png
@@ -59,6 +60,12 @@ Center crop to a square, then shrink:
 
 ```python
 process("photo.jpg", "square.webp", crop="1:1", max_side=1200, sharpen=True)
+```
+
+Soften after resize. The radius is in output pixels, and an alpha channel is blurred with the color:
+
+```python
+process("photo.jpg", "soft.jpg", max_side=800, blur=2)
 ```
 
 Catalog tile (subject fitted, white square, or a transparent one for a cutout):
@@ -99,6 +106,7 @@ process("cutout.png", "padded.png", pad=40, background="transparent")
 | `--format` / `fmt` | png, jpg, webp, avif |
 | `--quality` | JPEG/WebP quality |
 | `--max-bytes` | drop quality, then scale, until it fits |
+| `--blur` / `blur` | Gaussian blur radius in pixels; alpha is blurred too |
 | `--sharpen` / `sharpen` | unsharp after transforms (helps after resize) |
 | `--strip` / `strip` | drop EXIF and ICC when saving |
 | `--rotate` `--flip-x` `--flip-y` | geometry |
@@ -110,7 +118,7 @@ Copy-paste recipes: [USAGE.md](USAGE.md). Runnable scripts live in `examples/`.
 
 ## How it works
 
-`pixops` is a thin API over Pillow. It loads the photo, applies the transforms you asked for (crop, resize, canvas, pad, grayscale, rotate, flip, sharpen), then encodes PNG, JPEG, WebP, or AVIF. Crop runs before resize, so `--crop 1:1 --max 1200` is a 1200px square. `--sharpen` is an unsharp mask after those steps. `--max-bytes` lowers quality first and scales the image only if it still does not fit. `--strip` drops EXIF and ICC on save; otherwise remaining tags are kept. Everything runs on your machine.
+`pixops` is a thin API over Pillow. It loads the photo, applies the transforms you asked for (crop, resize, canvas, pad, grayscale, rotate, flip, blur, sharpen), then encodes PNG, JPEG, WebP, or AVIF. Crop runs before resize, so `--crop 1:1 --max 1200` is a 1200px square. `--blur` is a Gaussian blur after those steps, in output pixels, including the alpha channel. `--sharpen` is an unsharp mask after the blur. `--max-bytes` lowers quality first and scales the image only if it still does not fit. `--strip` drops EXIF and ICC on save; otherwise remaining tags are kept. Everything runs on your machine.
 
 ## License
 

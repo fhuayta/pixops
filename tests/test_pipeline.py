@@ -97,6 +97,19 @@ def test_cli_transparent_canvas(tmp_path: Path) -> None:
     assert out.getpixel((0, 0))[3] == 0
 
 
+def test_cli_blur(tmp_path: Path) -> None:
+    src = tmp_path / "photo.png"
+    image = Image.new("RGB", (20, 20), "white")
+    for y in range(20):
+        image.putpixel((0, y), (0, 0, 0))
+    image.save(src)
+    dest = tmp_path / "soft.png"
+    assert main([str(src), "--blur", "2", "-o", str(dest)]) == 0
+    out = Image.open(dest)
+    assert out.size == (20, 20)
+    assert out.getpixel((1, 10)) != (255, 255, 255)
+
+
 def test_cli_sharpen(tmp_path: Path) -> None:
     src = tmp_path / "photo.png"
     image = Image.new("RGB", (200, 100), "white")

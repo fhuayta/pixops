@@ -15,6 +15,7 @@ from pixops.io import (
     parse_bytes,
 )
 from pixops.ops import (
+    blur as blur_image,
     canvas,
     crop as crop_image,
     encode_image,
@@ -61,6 +62,7 @@ def process(
     degrees: float = 0,
     flip_x: bool = False,
     flip_y: bool = False,
+    blur: float | None = None,
     sharpen: bool = False,
     strip: bool = False,
     quality: int = 85,
@@ -80,6 +82,8 @@ def process(
         image = rotate(image, degrees)
     if flip_x or flip_y:
         image = flip(image, horizontal=flip_x, vertical=flip_y)
+    if blur:
+        image = blur_image(image, blur)
     if sharpen:
         image = sharpen_image(image)
     if pad is not None:

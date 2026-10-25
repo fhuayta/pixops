@@ -48,6 +48,20 @@ from pixops import process
 process("photo.jpg", "photo.webp", max_side=1200, sharpen=True)
 ```
 
+## Blur
+
+Soften a photo after it has been resized. The radius is in output pixels. On a cutout, the alpha is blurred too, which feathers the edge:
+
+```bash
+pixops photo.jpg --max 800 --blur 2 -o soft.jpg
+```
+
+```python
+from pixops import process
+
+process("photo.jpg", "soft.jpg", max_side=800, blur=2)
+```
+
 ## Grayscale
 
 ```bash

@@ -3,6 +3,7 @@ from PIL import Image
 
 from pixops.exceptions import TransformError
 from pixops.ops import (
+    blur,
     canvas,
     crop,
     encode_image,
@@ -146,6 +147,33 @@ def test_crop_box_outside_raises() -> None:
     image = Image.new("RGB", (20, 20), "red")
     with pytest.raises(TransformError, match="outside"):
         crop(image, "10,10,20,20")
+
+
+def test_blur_softens_a_hard_edge() -> None:
+    image = Image.new("RGB", (20, 20), "white")
+    for y in range(20):
+        image.putpixel((0, y), (0, 0, 0))
+    out = blur(image, 2)
+    assert out.size == (20, 20)
+    assert out.mode == "RGB"
+    neighbor = out.getpixel((1, 10))
+    assert neighbor != (255, 255, 255)
+    assert neighbor != (0, 0, 0)
+
+
+def test_blur_feathers_alpha() -> None:
+    image = Image.new("RGBA", (20, 20), (255, 0, 0, 0))
+    image.putpixel((10, 10), (255, 0, 0, 255))
+    out = blur(image, 1)
+    assert out.mode == "RGBA"
+    assert out.getpixel((11, 10))[3] > 0
+    assert out.getpixel((10, 10))[3] < 255
+
+
+def test_blur_rejects_non_positive_radius() -> None:
+    image = Image.new("RGB", (8, 8), "red")
+    with pytest.raises(TransformError, match="radius"):
+        blur(image, 0)
 
 
 def test_sharpen_keeps_size_and_alpha() -> None:

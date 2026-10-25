@@ -253,6 +253,16 @@ def pad(
     return board
 
 
+def blur(image: Image.Image, radius: float = 2) -> Image.Image:
+    """Gaussian blur. Palette images are expanded first. Alpha is blurred too."""
+    if radius <= 0:
+        raise TransformError("blur radius must be positive")
+    src = image
+    if src.mode == "P":
+        src = src.convert("RGBA" if "transparency" in src.info else "RGB")
+    return src.filter(ImageFilter.GaussianBlur(radius=radius))
+
+
 def sharpen(
     image: Image.Image,
     *,

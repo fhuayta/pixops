@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.6
+
+- Gaussian blur (`--blur 2` / `blur=2`). The radius is in pixels after resize and flips. Alpha is blurred with the color.
+
 ## 0.1.5
 
 - Drop EXIF and ICC on save (`--strip` / `strip=True`). Without it, remaining tags are kept after EXIF orientation is applied on load.
