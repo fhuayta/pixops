@@ -22,6 +22,7 @@ def build_parser() -> argparse.ArgumentParser:
             "  pixops cutout.png --pad 40 --bg transparent -o padded.png\n"
             "  pixops photo.jpg --crop 1:1 --max 1200 --sharpen\n"
             "  pixops photo.jpg --max 800 --blur 2 -o soft.jpg\n"
+            "  pixops tile.png --corners 48 -o rounded.png\n"
             "  pixops photo.jpg --format webp --max-bytes 150kb\n"
             "  pixops photo.jpg --max 1200 --strip -o clean.jpg"
         ),
@@ -70,6 +71,12 @@ def build_parser() -> argparse.ArgumentParser:
         type=float,
         metavar="RADIUS",
         help="Gaussian blur radius in pixels, after resize and flips",
+    )
+    parser.add_argument(
+        "--corners",
+        type=int,
+        metavar="PX",
+        help="round the outer corners after pad; use PNG or WebP to keep them transparent",
     )
     parser.add_argument(
         "--sharpen",
@@ -141,6 +148,7 @@ def main(argv: list[str] | None = None) -> int:
             flip_x=args.flip_x,
             flip_y=args.flip_y,
             blur=args.blur,
+            corners=args.corners,
             sharpen=args.sharpen,
             strip=args.strip,
             quality=args.quality,

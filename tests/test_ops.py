@@ -11,6 +11,7 @@ from pixops.ops import (
     grayscale,
     pad,
     resize,
+    round_corners,
     sharpen,
     strip_metadata,
 )
@@ -174,6 +175,22 @@ def test_blur_rejects_non_positive_radius() -> None:
     image = Image.new("RGB", (8, 8), "red")
     with pytest.raises(TransformError, match="radius"):
         blur(image, 0)
+
+
+def test_round_corners_clips_corner_and_keeps_center() -> None:
+    image = Image.new("RGBA", (40, 40), (255, 0, 0, 200))
+    out = round_corners(image, 12)
+    assert out.size == (40, 40)
+    assert out.mode == "RGBA"
+    assert out.getpixel((0, 0))[3] == 0
+    assert out.getpixel((20, 20)) == (255, 0, 0, 200)
+    assert image.getpixel((0, 0))[3] == 200
+
+
+def test_round_corners_rejects_non_positive() -> None:
+    image = Image.new("RGB", (8, 8), "red")
+    with pytest.raises(TransformError, match="radius"):
+        round_corners(image, 0)
 
 
 def test_sharpen_keeps_size_and_alpha() -> None:

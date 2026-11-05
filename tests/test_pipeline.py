@@ -97,6 +97,17 @@ def test_cli_transparent_canvas(tmp_path: Path) -> None:
     assert out.getpixel((0, 0))[3] == 0
 
 
+def test_cli_corners(tmp_path: Path) -> None:
+    src = tmp_path / "tile.png"
+    Image.new("RGBA", (40, 40), (0, 128, 255, 255)).save(src)
+    dest = tmp_path / "rounded.png"
+    assert main([str(src), "--corners", "12", "-o", str(dest)]) == 0
+    out = Image.open(dest)
+    assert out.size == (40, 40)
+    assert out.getpixel((0, 0))[3] == 0
+    assert out.getpixel((20, 20))[:3] == (0, 128, 255)
+
+
 def test_cli_blur(tmp_path: Path) -> None:
     src = tmp_path / "photo.png"
     image = Image.new("RGB", (20, 20), "white")

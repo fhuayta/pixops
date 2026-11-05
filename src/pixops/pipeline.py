@@ -25,6 +25,7 @@ from pixops.ops import (
     pad as pad_image,
     resize,
     rotate,
+    round_corners,
     sharpen as sharpen_image,
 )
 
@@ -63,6 +64,7 @@ def process(
     flip_x: bool = False,
     flip_y: bool = False,
     blur: float | None = None,
+    corners: int | None = None,
     sharpen: bool = False,
     strip: bool = False,
     quality: int = 85,
@@ -88,6 +90,8 @@ def process(
         image = sharpen_image(image)
     if pad is not None:
         image = pad_image(image, pad, color=background)
+    if corners:
+        image = round_corners(image, corners)
 
     src_path = source if isinstance(source, Path) else None
     if isinstance(source, str):

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from io import BytesIO
 
-from PIL import Image, ImageFilter, ImageOps
+from PIL import Image, ImageChops, ImageDraw, ImageFilter, ImageOps
 
 from pixops.exceptions import TransformError
 
@@ -251,6 +251,24 @@ def pad(
     else:
         board.paste(pasted, (left, top))
     return board
+
+
+def round_corners(image: Image.Image, radius: int) -> Image.Image:
+    """Clip the outer corners. Existing alpha is kept and then masked."""
+    if isinstance(radius, bool) or not isinstance(radius, int) or radius <= 0:
+        raise TransformError("corner radius must be a positive integer")
+    src = image.convert("RGBA")
+    limit = min(src.width, src.height) // 2
+    if limit <= 0:
+        return src
+    mask = Image.new("L", src.size, 0)
+    ImageDraw.Draw(mask).rounded_rectangle(
+        (0, 0, src.width, src.height),
+        radius=min(radius, limit),
+        fill=255,
+    )
+    src.putalpha(ImageChops.multiply(src.getchannel("A"), mask))
+    return src
 
 
 def blur(image: Image.Image, radius: float = 2) -> Image.Image:

@@ -62,6 +62,20 @@ from pixops import process
 process("photo.jpg", "soft.jpg", max_side=800, blur=2)
 ```
 
+## Rounded corners
+
+Clip the outer corners after resize, canvas, and padding. Use PNG or WebP so the corners stay transparent:
+
+```bash
+pixops tile.png --corners 48 -o rounded.png
+```
+
+```python
+from pixops import process
+
+process("tile.png", "rounded.png", corners=48)
+```
+
 ## Grayscale
 
 ```bash

@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.7
+
+- Rounded corners (`--corners 48` / `corners=48`). Applied after padding. Clipped pixels stay transparent on PNG and WebP.
+
 ## 0.1.6
 
 - Gaussian blur (`--blur 2` / `blur=2`). The radius is in pixels after resize and flips. Alpha is blurred with the color.

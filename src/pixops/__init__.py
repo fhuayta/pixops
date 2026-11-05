@@ -10,6 +10,7 @@ from pixops.ops import (
     grayscale,
     pad,
     resize,
+    round_corners,
     sharpen,
     strip_metadata,
 )
@@ -31,10 +32,11 @@ __all__ = [
     "process",
     "process_many",
     "resize",
+    "round_corners",
     "save_bytes",
     "sharpen",
     "strip_metadata",
     "__version__",
 ]
 
-__version__ = "0.1.6"
+__version__ = "0.1.7"
