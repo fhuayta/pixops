@@ -97,6 +97,15 @@ def test_cli_transparent_canvas(tmp_path: Path) -> None:
     assert out.getpixel((0, 0))[3] == 0
 
 
+def test_cli_brightness_contrast(tmp_path: Path) -> None:
+    src = tmp_path / "photo.png"
+    Image.new("RGB", (20, 20), (180, 180, 180)).save(src)
+    dest = tmp_path / "punchy.png"
+    assert main([str(src), "--brightness", "1.2", "--contrast", "1.3", "-o", str(dest)]) == 0
+    assert Image.open(dest).size == (20, 20)
+    assert Image.open(dest).getpixel((0, 0)) != (180, 180, 180)
+
+
 def test_cli_border(tmp_path: Path) -> None:
     src = tmp_path / "photo.png"
     Image.new("RGB", (20, 10), "red").save(src)

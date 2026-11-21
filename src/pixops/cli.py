@@ -24,6 +24,7 @@ def build_parser() -> argparse.ArgumentParser:
             "  pixops photo.jpg --max 800 --blur 2 -o soft.jpg\n"
             "  pixops tile.png --corners 48 -o rounded.png\n"
             "  pixops photo.jpg --border 8 --border-color '#111111' -o framed.jpg\n"
+            "  pixops photo.jpg --brightness 1.1 --contrast 1.2 -o punchy.jpg\n"
             "  pixops photo.jpg --format webp --max-bytes 150kb\n"
             "  pixops photo.jpg --max 1200 --strip -o clean.jpg"
         ),
@@ -67,6 +68,18 @@ def build_parser() -> argparse.ArgumentParser:
         help="margin around the image: 40, 10,20, or 10,20,10,20",
     )
     parser.add_argument("--gray", action="store_true", help="convert to grayscale")
+    parser.add_argument(
+        "--brightness",
+        type=float,
+        metavar="FACTOR",
+        help="brightness multiplier; 1.0 is unchanged, 0 is black",
+    )
+    parser.add_argument(
+        "--contrast",
+        type=float,
+        metavar="FACTOR",
+        help="contrast multiplier; 1.0 is unchanged, 0 is flat gray",
+    )
     parser.add_argument(
         "--blur",
         type=float,
@@ -156,6 +169,8 @@ def main(argv: list[str] | None = None) -> int:
             background=args.bg,
             pad=args.pad,
             gray=args.gray,
+            brightness=args.brightness,
+            contrast=args.contrast,
             degrees=args.rotate,
             flip_x=args.flip_x,
             flip_y=args.flip_y,

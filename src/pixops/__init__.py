@@ -5,7 +5,9 @@ from pixops.io import load_image, save_bytes
 from pixops.ops import (
     blur,
     border,
+    brightness,
     canvas,
+    contrast,
     crop,
     encode_under_bytes,
     grayscale,
@@ -25,7 +27,9 @@ __all__ = [
     "UnsupportedInputError",
     "blur",
     "border",
+    "brightness",
     "canvas",
+    "contrast",
     "crop",
     "encode_under_bytes",
     "grayscale",
@@ -41,4 +45,4 @@ __all__ = [
     "__version__",
 ]
 
-__version__ = "0.1.8"
+__version__ = "0.1.9"

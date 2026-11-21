@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.9
+
+- Brightness and contrast (`--brightness 1.1`, `--contrast 1.2`). Factor `1.0` is unchanged. Alpha is preserved.
+
 ## 0.1.8
 
 - Image border (`--border 8` / `border=8`). Color defaults to `#000000` (`--border-color`). Applied after padding and before rounded corners.

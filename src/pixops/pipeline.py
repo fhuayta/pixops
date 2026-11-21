@@ -17,7 +17,9 @@ from pixops.io import (
 from pixops.ops import (
     blur as blur_image,
     border as border_image,
+    brightness as brightness_image,
     canvas,
+    contrast as contrast_image,
     crop as crop_image,
     encode_image,
     encode_under_bytes,
@@ -61,6 +63,8 @@ def process(
     background: str = "#FFFFFF",
     pad: int | str | tuple[int, ...] | None = None,
     gray: bool = False,
+    brightness: float | None = None,
+    contrast: float | None = None,
     degrees: float = 0,
     flip_x: bool = False,
     flip_y: bool = False,
@@ -83,6 +87,10 @@ def process(
         image = canvas(image, canvas_size[0], canvas_size[1], color=background)
     if gray:
         image = grayscale(image)
+    if brightness is not None:
+        image = brightness_image(image, brightness)
+    if contrast is not None:
+        image = contrast_image(image, contrast)
     if degrees:
         image = rotate(image, degrees)
     if flip_x or flip_y:

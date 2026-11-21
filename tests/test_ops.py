@@ -5,7 +5,9 @@ from pixops.exceptions import TransformError
 from pixops.ops import (
     blur,
     border,
+    brightness,
     canvas,
+    contrast,
     crop,
     encode_image,
     encode_under_bytes,
@@ -176,6 +178,29 @@ def test_blur_rejects_non_positive_radius() -> None:
     image = Image.new("RGB", (8, 8), "red")
     with pytest.raises(TransformError, match="radius"):
         blur(image, 0)
+
+
+def test_brightness_darkens() -> None:
+    image = Image.new("RGB", (8, 8), (200, 100, 50))
+    out = brightness(image, 0.5)
+    assert out.size == (8, 8)
+    pixel = out.getpixel((0, 0))
+    assert pixel[0] < 200
+    assert pixel[1] < 100
+    assert pixel[2] < 50
+
+
+def test_contrast_keeps_alpha() -> None:
+    image = Image.new("RGBA", (8, 8), (180, 180, 180, 160))
+    out = contrast(image, 1.5)
+    assert out.mode == "RGBA"
+    assert out.getpixel((0, 0))[3] == 160
+
+
+def test_brightness_rejects_negative() -> None:
+    image = Image.new("RGB", (4, 4), "red")
+    with pytest.raises(TransformError, match="brightness"):
+        brightness(image, -0.1)
 
 
 def test_border_adds_stroke() -> None:

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from io import BytesIO
 
-from PIL import Image, ImageChops, ImageDraw, ImageFilter, ImageOps
+from PIL import Image, ImageChops, ImageDraw, ImageEnhance, ImageFilter, ImageOps
 
 from pixops.exceptions import TransformError
 
@@ -291,6 +291,38 @@ def round_corners(image: Image.Image, radius: int) -> Image.Image:
     )
     src.putalpha(ImageChops.multiply(src.getchannel("A"), mask))
     return src
+
+
+def _enhance_rgb(
+    image: Image.Image,
+    *,
+    kind: str,
+    factor: float,
+) -> Image.Image:
+    if factor < 0:
+        raise TransformError(f"{kind} factor cannot be negative")
+    if abs(factor - 1.0) < 1e-9:
+        return image.copy()
+    enhancer_cls = ImageEnhance.Brightness if kind == "brightness" else ImageEnhance.Contrast
+    if image.mode in {"RGBA", "LA"}:
+        alpha = image.getchannel("A")
+        rgb = enhancer_cls(image.convert("RGB")).enhance(factor)
+        out = rgb.convert("RGBA")
+        out.putalpha(alpha)
+        return out
+    if image.mode == "P":
+        return enhancer_cls(image.convert("RGB")).enhance(factor)
+    return enhancer_cls(image).enhance(factor)
+
+
+def brightness(image: Image.Image, factor: float) -> Image.Image:
+    """Scale brightness. 1.0 leaves the image unchanged; 0 is black."""
+    return _enhance_rgb(image, kind="brightness", factor=factor)
+
+
+def contrast(image: Image.Image, factor: float) -> Image.Image:
+    """Scale contrast. 1.0 leaves the image unchanged; 0 is flat gray."""
+    return _enhance_rgb(image, kind="contrast", factor=factor)
 
 
 def blur(image: Image.Image, radius: float = 2) -> Image.Image:

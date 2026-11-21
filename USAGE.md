@@ -48,6 +48,20 @@ from pixops import process
 process("photo.jpg", "photo.webp", max_side=1200, sharpen=True)
 ```
 
+## Brightness and contrast
+
+Factor `1.0` leaves the photo alone. Above `1` brightens or adds punch; `0` is black for brightness or flat gray for contrast:
+
+```bash
+pixops photo.jpg --brightness 1.1 --contrast 1.2 -o punchy.jpg
+```
+
+```python
+from pixops import process
+
+process("photo.jpg", "punchy.jpg", brightness=1.1, contrast=1.2)
+```
+
 ## Blur
 
 Soften a photo after it has been resized. The radius is in output pixels. On a cutout, the alpha is blurred too, which feathers the edge:
