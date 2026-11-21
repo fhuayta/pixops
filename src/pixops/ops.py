@@ -253,6 +253,28 @@ def pad(
     return board
 
 
+def border(
+    image: Image.Image,
+    width: int,
+    *,
+    color: str = "#000000",
+) -> Image.Image:
+    """Draw a stroke around the image. Existing alpha is preserved inside."""
+    if isinstance(width, bool) or not isinstance(width, int) or width <= 0:
+        raise TransformError("border width must be a positive integer")
+    red, green, blue, alpha = parse_color(color)
+    needs_alpha = alpha < 255 or image.mode in {"RGBA", "LA"}
+    mode = "RGBA" if needs_alpha else "RGB"
+    fill: tuple[int, ...] = (red, green, blue, alpha) if mode == "RGBA" else (red, green, blue)
+    out_w = image.width + width * 2
+    out_h = image.height + width * 2
+    board = Image.new(mode, (out_w, out_h), fill)
+    # Paste without a mask so the interior keeps its own alpha instead of
+    # compositing over the stroke.
+    board.paste(image.convert(mode), (width, width))
+    return board
+
+
 def round_corners(image: Image.Image, radius: int) -> Image.Image:
     """Clip the outer corners. Existing alpha is kept and then masked."""
     if isinstance(radius, bool) or not isinstance(radius, int) or radius <= 0:

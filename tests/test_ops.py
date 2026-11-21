@@ -4,6 +4,7 @@ from PIL import Image
 from pixops.exceptions import TransformError
 from pixops.ops import (
     blur,
+    border,
     canvas,
     crop,
     encode_image,
@@ -175,6 +176,30 @@ def test_blur_rejects_non_positive_radius() -> None:
     image = Image.new("RGB", (8, 8), "red")
     with pytest.raises(TransformError, match="radius"):
         blur(image, 0)
+
+
+def test_border_adds_stroke() -> None:
+    image = Image.new("RGB", (20, 10), "red")
+    out = border(image, 4, color="#00FF00")
+    assert out.size == (28, 18)
+    assert out.mode == "RGB"
+    assert out.getpixel((0, 0)) == (0, 255, 0)
+    assert out.getpixel((4, 4)) == (255, 0, 0)
+
+
+def test_border_keeps_alpha() -> None:
+    image = Image.new("RGBA", (10, 10), (255, 0, 0, 200))
+    out = border(image, 2, color="#00000080")
+    assert out.mode == "RGBA"
+    assert out.size == (14, 14)
+    assert out.getpixel((0, 0)) == (0, 0, 0, 128)
+    assert out.getpixel((2, 2)) == (255, 0, 0, 200)
+
+
+def test_border_rejects_non_positive() -> None:
+    image = Image.new("RGB", (8, 8), "red")
+    with pytest.raises(TransformError, match="width"):
+        border(image, 0)
 
 
 def test_round_corners_clips_corner_and_keeps_center() -> None:

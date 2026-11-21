@@ -28,6 +28,7 @@ pixops photo.jpg --max-bytes 150kb --format webp
 pixops photo.jpg --crop 1:1 --max 1200 --sharpen
 pixops photo.jpg --max 800 --blur 2 -o soft.jpg
 pixops tile.png --corners 48 -o rounded.png
+pixops photo.jpg --border 8 --border-color "#111111" -o framed.jpg
 pixops product.jpg --canvas 1000x1000 --bg "#FFFFFF" -o product.png
 pixops cutout.png --canvas 1000x1000 --bg transparent -o tile.png
 pixops cutout.png --pad 40 --bg transparent -o padded.png
@@ -75,6 +76,12 @@ Round the outer corners after every other transform. PNG and WebP keep the clipp
 process("tile.png", "rounded.png", corners=48)
 ```
 
+Frame a photo with a solid stroke. The color is separate from the canvas fill so catalog tiles can stay white while the border is dark:
+
+```python
+process("photo.jpg", "framed.jpg", border=8, border_color="#111111")
+```
+
 Catalog tile (subject fitted, white square, or a transparent one for a cutout):
 
 ```python
@@ -114,6 +121,8 @@ process("cutout.png", "padded.png", pad=40, background="transparent")
 | `--quality` | JPEG/WebP quality |
 | `--max-bytes` | drop quality, then scale, until it fits |
 | `--blur` / `blur` | Gaussian blur radius in pixels; alpha is blurred too |
+| `--border` / `border` | stroke width in pixels around the image |
+| `--border-color` / `border_color` | stroke fill: `#RRGGBB`, `#RRGGBBAA`, or `transparent` |
 | `--corners` / `corners` | round the outer corners; clipped pixels stay transparent |
 | `--sharpen` / `sharpen` | unsharp after transforms (helps after resize) |
 | `--strip` / `strip` | drop EXIF and ICC when saving |
@@ -126,7 +135,7 @@ Copy-paste recipes: [USAGE.md](USAGE.md). Runnable scripts live in `examples/`.
 
 ## How it works
 
-`pixops` is a thin API over Pillow. It loads the photo, applies the transforms you asked for (crop, resize, canvas, pad, grayscale, rotate, flip, blur, sharpen, rounded corners), then encodes PNG, JPEG, WebP, or AVIF. Crop runs before resize, so `--crop 1:1 --max 1200` is a 1200px square. `--blur` is a Gaussian blur after those steps, in output pixels, including the alpha channel. `--sharpen` is an unsharp mask after the blur. `--corners` clips the outer corners last, so padding is included. `--max-bytes` lowers quality first and scales the image only if it still does not fit. `--strip` drops EXIF and ICC on save; otherwise remaining tags are kept. Everything runs on your machine.
+`pixops` is a thin API over Pillow. It loads the photo, applies the transforms you asked for (crop, resize, canvas, pad, border, grayscale, rotate, flip, blur, sharpen, rounded corners), then encodes PNG, JPEG, WebP, or AVIF. Crop runs before resize, so `--crop 1:1 --max 1200` is a 1200px square. `--blur` is a Gaussian blur after those steps, in output pixels, including the alpha channel. `--sharpen` is an unsharp mask after the blur. `--border` draws a stroke after padding; `--corners` clips the outer edge last so the stroke is included. `--max-bytes` lowers quality first and scales the image only if it still does not fit. `--strip` drops EXIF and ICC on save; otherwise remaining tags are kept. Everything runs on your machine.
 
 ## License
 

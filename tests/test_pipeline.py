@@ -97,6 +97,17 @@ def test_cli_transparent_canvas(tmp_path: Path) -> None:
     assert out.getpixel((0, 0))[3] == 0
 
 
+def test_cli_border(tmp_path: Path) -> None:
+    src = tmp_path / "photo.png"
+    Image.new("RGB", (20, 10), "red").save(src)
+    dest = tmp_path / "framed.png"
+    assert main([str(src), "--border", "4", "--border-color", "#00FF00", "-o", str(dest)]) == 0
+    out = Image.open(dest)
+    assert out.size == (28, 18)
+    assert out.getpixel((0, 0)) == (0, 255, 0)
+    assert out.getpixel((4, 4)) == (255, 0, 0)
+
+
 def test_cli_corners(tmp_path: Path) -> None:
     src = tmp_path / "tile.png"
     Image.new("RGBA", (40, 40), (0, 128, 255, 255)).save(src)

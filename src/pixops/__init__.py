@@ -4,6 +4,7 @@ from pixops.exceptions import PixOpsError, OutputError, TransformError, Unsuppor
 from pixops.io import load_image, save_bytes
 from pixops.ops import (
     blur,
+    border,
     canvas,
     crop,
     encode_under_bytes,
@@ -23,6 +24,7 @@ __all__ = [
     "TransformError",
     "UnsupportedInputError",
     "blur",
+    "border",
     "canvas",
     "crop",
     "encode_under_bytes",
@@ -39,4 +41,4 @@ __all__ = [
     "__version__",
 ]
 
-__version__ = "0.1.7"
+__version__ = "0.1.8"

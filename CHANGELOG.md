@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.8
+
+- Image border (`--border 8` / `border=8`). Color defaults to `#000000` (`--border-color`). Applied after padding and before rounded corners.
+
 ## 0.1.7
 
 - Rounded corners (`--corners 48` / `corners=48`). Applied after padding. Clipped pixels stay transparent on PNG and WebP.

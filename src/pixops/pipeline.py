@@ -16,6 +16,7 @@ from pixops.io import (
 )
 from pixops.ops import (
     blur as blur_image,
+    border as border_image,
     canvas,
     crop as crop_image,
     encode_image,
@@ -64,6 +65,8 @@ def process(
     flip_x: bool = False,
     flip_y: bool = False,
     blur: float | None = None,
+    border: int | None = None,
+    border_color: str = "#000000",
     corners: int | None = None,
     sharpen: bool = False,
     strip: bool = False,
@@ -90,6 +93,8 @@ def process(
         image = sharpen_image(image)
     if pad is not None:
         image = pad_image(image, pad, color=background)
+    if border:
+        image = border_image(image, border, color=border_color)
     if corners:
         image = round_corners(image, corners)
 
